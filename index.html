@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tg-jump</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  body { margin: 0; height: 100vh; display: flex; align-items: center; justify-content: center;
+         font: 15px -apple-system, system-ui, sans-serif;
+         background: var(--tg-theme-bg-color, #fff); color: var(--tg-theme-hint-color, #888); }
+  a { color: var(--tg-theme-link-color, #2481cc); }
+</style>
+</head>
+<body>
+<p id="msg">↪︎ đang chuyển…</p>
+<script>
+  // One-tap jump between Telegram bots: ?to=<bot username>&start=<start param>
+  const q = new URLSearchParams(location.search);
+  const to = q.get("to") || "";
+  const start = q.get("start") || "";
+  const msg = document.getElementById("msg");
+  if (!/^[A-Za-z0-9_]{5,32}$/.test(to) || !/^[A-Za-z0-9_-]{0,64}$/.test(start)) {
+    msg.textContent = "⊘ tham số không hợp lệ";
+  } else {
+    const link = "https://t.me/" + to + (start ? "?start=" + start : "");
+    msg.innerHTML = '↪︎ <a href="' + link + '">@' + to + "</a>";
+    const app = window.Telegram && Telegram.WebApp;
+    if (app && app.initData !== undefined && app.platform !== "unknown") {
+      app.ready();
+      app.openTelegramLink(link);
+      setTimeout(() => app.close(), 300);
+    } else {
+      location.replace(link);
+    }
+  }
+</script>
+</body>
+</html>
